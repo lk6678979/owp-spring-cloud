@@ -1,0 +1,41 @@
+logging:
+  #日志配置路径
+  config: classpath:logback-spring-local.xml
+server:
+  #服务启动端口号
+  port: 8806
+spring:
+  #启动时使用的配置文件后缀，会自动找到application-profiles.yml文件
+#  profiles: dev-one
+  #服务名称
+  application:
+    name: eureka-server
+#eureka服务注册发现中心配置
+eureka:
+  #服务配置
+  server:
+    #是否启用注册中心的保护机制，Eureka 会统计15分钟之内心跳失败的比例低于85%将会触发保护机制，不剔除服务提供者，如果关闭服务注册中心将不可用的实例正确剔除
+    enable-self-preservation: false
+  instance:
+    #是否使用ip注册（默认使用域名注册）
+    preferIpAddress: true
+    #健康检查页面的URL，1.X版本默认/health，2.X版本默认/actuator/health，一般不需要更改
+    health-check-url-path: /actuator/health
+  client:
+    #是否将注册中心本身也注册到注册中心中
+    registerWithEureka: true
+    #此客户端是否获取eureka服务器注册表上的注册信息（注册中心不会去调用其他服务，所以不需要获取注册信息）
+    fetchRegistry: false
+    serviceUrl:
+      #注册中心URL
+      defaultZone: http://127.0.0.1:8806/eureka/,http://127.0.0.1:8807/eureka/
+management:
+  endpoints:
+    web:
+      exposure:
+        #开放所有页面节点  默认只开启了health、info两个节点
+        include: "*"
+  endpoint:
+    health:
+      #显示健康具体信息  默认不会显示详细信息
+      show-details: ALWAYS

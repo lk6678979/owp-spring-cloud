@@ -1,9 +1,6 @@
 # spingcloud服务注册中心 
 
-## 1. 使用spring boot initializer获取maven项目，http://start.spring.io/
-### 1.1 组建选择如下：
-
-![](https://raw.githubusercontent.com/lk6678979/lk-spring-eureka-server/master/lk-eureka-server/readme/iochoose.png)  
+### 1.1 创建一个普通的maven项目
 
 ### 1.2 创建完的工程pom.xml文件中的依赖如下：
 
@@ -53,69 +50,89 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 是否打包为可执行jar包-->
+                    <executable>true</executable>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 ```
 
 ## 2.代码编写
 ### 2.1 JAVA代码，仅需要在springboot工程的启动application类上添加`@EnableEurekaServer`注解：
 ```
+package com.owp.eureka;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+
 @SpringBootApplication
 @EnableEurekaServer
-public class EurekaServerApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(EurekaServerApplication.class, args);
-	}
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
 }
+
 ```
-### 2.2 创建3个配置文件，applycation-one.yml,applycation-two.yml,applycation-three.yml(用于注册中心高可用集群)，其中一个配置文件如下
+### 2.2 创建3个配置文件，applycation-one.yml,applycation-two.yml,applycation-three.yml(用于注册中心高可用集群)，其中一个配置文件如下，3个配置文件指定不同的server.port，并在defaultZone中配置其他2个yml启动的服务器的ip端口
 ```
-#服务启动端口号
 server:
+  #服务启动端口号
   port: 8806
 spring:
-  profiles: one
-  boot:
-    admin:
-      #springboot监控中心地址
-      url: boot.admin.web:7000
+  #服务名称
   application:
     name: eureka-server
+#eureka服务注册发现中心配置
 eureka:
+  #服务配置
+  server:
+    #是否启用注册中心的保护机制，Eureka 会统计15分钟之内心跳失败的比例低于85%将会触发保护机制，不剔除服务提供者，如果关闭服务注册中心将不可用的实例正确剔除
+    enable-self-preservation: false
   instance:
-    #设置当前实例的主机名称(说明：该host将会在服务调用时使用，调用方需要配置该host对应的ip)
-    #如果不想使用host使用ip在注册使用，则配置eureka.instance.perferIpAddress=true
-    #preferIpAddress:true
-    hostname: eureka.server.one
+    #是否使用ip注册（默认使用域名注册）
+    preferIpAddress: true
+    #健康检查页面的URL，1.X版本默认/health，2.X版本默认/actuator/health，一般不需要更改
+    health-check-url-path: /actuator/health
   client:
-    #是否注册自身到eureka服务器
+    #是否将注册中心本身也注册到注册中心中
     registerWithEureka: true
-    #是否检索服务
+    #此客户端是否获取eureka服务器注册表上的注册信息（注册中心不会去调用其他服务，所以不需要获取注册信息）
     fetchRegistry: false
-    #指定服务注册中心地址，这里使用3个注册中心相互注册实现集群
     serviceUrl:
-      defaultZone: http://eureka.server.three:8808/eureka/,http://eureka.server.two:8807/eureka/
-#忽略权限拦截，外部系统，例如springboot admin 和mq刷新配置都需要权限
+      #注册中心URL，配置需要注入的配置中心，如果有2个注册中心则需要配置2个，如果有3个，则只需要注入除自己的另外2个
+      defaultZone: http://127.0.0.1:8807/eureka/,http://127.0.0.1:8807/eureka/
 management:
-  security:
-    enabled: false
+  endpoints:
+    web:
+      exposure:
+        #开放所有页面节点  默认只开启了health、info两个节点
+        include: "*"
+  endpoint:
+    health:
+      #显示健康具体信息  默认不会显示详细信息
+      show-details: ALWAYS
 ```
 ### 2.3 启动
 #### 2.3.1 使用maven打包项目
 #### 2.3.2 启动jar
 依次执行下面指令启动3个集群的注册中心：  
-	java -jar lk-eureka-server-0.0.1-SNAPSHOT.jar --spring.profiles.active=one  
-	java -jar lk-eureka-server-0.0.1-SNAPSHOT.jar --spring.profiles.active=two  
-	java -jar lk-eureka-server-0.0.1-SNAPSHOT.jar --spring.profiles.active=three
-#### 2.3.3 域名配置
-在计算机host目录下添加3个hostname：  
-127.0.0.1 eureka.server.one  
-127.0.0.1 eureka.server.two  
-127.0.0.1 eureka.server.three  
-## 2.可视化界面
+	java -jar eureka-server-1.0.0.jar --spring.profiles.active=one  
+	java -jar eureka-server-1.0.0.jar --spring.profiles.active=two  
+	java -jar eureka-server-1.0.0.jar --spring.profiles.active=three  
+## 2.4可视化界面
 在浏览器依次打开:  
-http://eureka.server.one:8806/  
-http://eureka.server.two:8807/  
-http://eureka.server.three:8808/  
+http://127.0.0.1:8806/  
+http://127.0.0.1:8807/  
+http://127.0.0.1:8808/  
 界面效果如下：
-![](https://raw.githubusercontent.com/lk6678979/lk-spring-eureka-server/master/lk-eureka-server/readme/springcloudui.png)  
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/eureka-ui.png)  
 	

@@ -1,1 +1,4 @@
 eureka-server/target/
+eureka-server/log/baseInfo.log
+eureka-server/log/baseError.log
+eureka-server/README.md

@@ -1,0 +1,28 @@
+logging:
+  config: classpath:logback-spring-local.xml
+server:
+  port: 8807
+spring:
+  application:
+    name: eureka-server
+eureka:
+  server:
+    enable-self-preservation: false
+  instance:
+    preferIpAddress: true
+    health-check-url-path: /actuator/health
+  client:
+    registerWithEureka: true
+    fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://127.0.0.1:8806/eureka/,http://127.0.0.1:8808/eureka/
+management:
+  endpoints:
+    web:
+      exposure:
+        #开放所有页面节点  默认只开启了health、info两个节点
+        include: "*"
+  endpoint:
+    health:
+      #显示健康具体信息  默认不会显示详细信息
+      show-details: ALWAYS

@@ -54,24 +54,16 @@
         </dependencies>
     </dependencyManagement>
 
-    <profiles>
-        <!-- 本地配置1 -->
-        <profile>
-            <id>local-one</id>
-            <properties>
-                <env>local-one</env>
-            </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
-        <!-- 本地配置2 -->
-        <profile>
-            <id>local-two</id>
-            <properties>
-                <env>local-two</env>
-            </properties>
-        </profile>
-    </profiles>
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 是否打包为可执行jar包-->
+                    <executable>true</executable>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

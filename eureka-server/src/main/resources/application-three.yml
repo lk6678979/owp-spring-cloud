@@ -1,9 +1,8 @@
 logging:
   config: classpath:logback-spring-local.xml
 server:
-  port: 8807
+  port: 8808
 spring:
-#  profiles: dev-two
   application:
     name: eureka-server
 eureka:

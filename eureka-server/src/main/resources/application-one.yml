@@ -5,8 +5,6 @@ server:
   #服务启动端口号
   port: 8806
 spring:
-  #启动时使用的配置文件后缀，会自动找到application-profiles.yml文件
-#  profiles: dev-one
   #服务名称
   application:
     name: eureka-server
@@ -28,7 +26,7 @@ eureka:
     fetchRegistry: false
     serviceUrl:
       #注册中心URL
-      defaultZone: http://127.0.0.1:8806/eureka/,http://127.0.0.1:8807/eureka/
+      defaultZone: http://127.0.0.1:8807/eureka/,http://127.0.0.1:8808/eureka/
 management:
   endpoints:
     web:

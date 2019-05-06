@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
     <contextName>logback</contextName>
+    <property name="LOG_HOME" value="C:/log"/>
+    <springProperty scope="context" name="SERVER_PORT" source="server.port"/>
+    <springProperty scope="context" name="APPLICATION_NAME" source="spring.application.name"/>
+
     <!-- 如果本地使用idea,或者是安装了ansi escape in console 插件(支持彩色日志), 可以在application.properties
         文件里面里面 logging.config指向本文件 -->
     <!-- 打印控制台格式 -->
@@ -24,38 +28,44 @@
     </appender>
 
     <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${user.dir}/log/baseInfo.log</File>
+        <File>${LOG_HOME}/${APPLICATION_NAME}/${SERVER_PORT}/baseInfo.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${user.dir}/log/baseInfo-%d{yyyyMMdd}.log.%i
+            <fileNamePattern>${LOG_HOME}/${APPLICATION_NAME}/${SERVER_PORT}/baseInfo-%d{yyyyMMdd}.log.%i
             </fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
             <maxHistory>2</maxHistory>
         </rollingPolicy>
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} -%msg%n
-            </Pattern>
-        </layout>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} -%msg%n
+                </Pattern>
+            </layout>
+            <charset>GBK</charset>
+        </encoder>
     </appender>
 
     <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>ERROR</level>
         </filter>
-        <File>${user.dir}/log/baseError.log</File>
+        <File>${LOG_HOME}/${APPLICATION_NAME}/${SERVER_PORT}/baseError.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${user.dir}/log/baseError-%d{yyyyMMdd}.log.%i
+            <fileNamePattern>${LOG_HOME}/${APPLICATION_NAME}/${SERVER_PORT}/baseError-%d{yyyyMMdd}.log.%i
             </fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>50MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
             <maxHistory>7</maxHistory>
         </rollingPolicy>
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} -%msg%n
-            </Pattern>
-        </layout>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} -%msg%n
+                </Pattern>
+            </layout>
+            <charset>GBK</charset>
+        </encoder>
     </appender>
 
     <!--myibatis log configure -->
@@ -71,8 +81,8 @@
     <!-- 输出日志 -->
     <root level="debug">
         <appender-ref ref="console"/>
-        <appender-ref ref="ERROR_FILE"/>
         <appender-ref ref="INFO_FILE"/>
+        <appender-ref ref="ERROR_FILE"/>
     </root>
 
 </configuration>

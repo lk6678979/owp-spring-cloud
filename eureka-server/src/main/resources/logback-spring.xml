@@ -2,33 +2,28 @@
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
     <contextName>logback</contextName>
     <!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径 -->
-    <property name="LOG_HOME" value="/tmp/logback"/>
-    <!--定义spring配置文件中的变量 -->
+    <property name="LOG_HOME" value="/data/log/logback"/>
     <springProperty scope="context" name="SERVER_PORT" source="server.port"/>
     <springProperty scope="context" name="APPLICATION_NAME" source="spring.application.name"/>
 
-    <!-- 配置info级别的日志输出模版 -->
     <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!-- 日常存储路径-->
         <File>${LOG_HOME}/${APPLICATION_NAME}/${SERVER_PORT}/baseInfo.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- 日志文件切割文件名格式-->
             <fileNamePattern>${LOG_HOME}/${APPLICATION_NAME}/${SERVER_PORT}/baseInfo-%d{yyyyMMdd}.log.%i</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <!-- 日志切割大小 -->
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
-            <!-- 日志保存时间（天）-->
-            <maxHistory>2</maxHistory>
+            <maxHistory>5</maxHistory>
         </rollingPolicy>
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <!-- 日志输出格式 -->
-            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} -%msg%n
-            </Pattern>
-        </layout>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} -%msg%n
+                </Pattern>
+            </layout>
+            <charset>UTF-8</charset>
+        </encoder>
     </appender>
 
-    <!-- 配置error级别的日志输出模版 -->
     <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>ERROR</level>
@@ -38,17 +33,21 @@
             <fileNamePattern>${LOG_HOME}/${APPLICATION_NAME}/${SERVER_PORT}/baseError-%d{yyyyMMdd}.log.%i
             </fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>50MB</maxFileSize>
+                <maxFileSize>200MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
             <maxHistory>7</maxHistory>
         </rollingPolicy>
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} -%msg%n
-            </Pattern>
-        </layout>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} -%msg%n
+                </Pattern>
+            </layout>
+            <charset>UTF-8</charset>
+        </encoder>
     </appender>
 
-    <!--Mybatis、数据库日志级别设置 -->
+
+    <!--myibatis log configure -->
     <logger name="com.apache.ibatis" level="TRACE"/>
     <logger name="java.sql.Connection" level="DEBUG"/>
     <logger name="java.sql.Statement" level="DEBUG"/>

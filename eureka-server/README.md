@@ -123,9 +123,9 @@ management:
 127.0.0.1 eureka.server.three  
 ## 2.可视化界面
 在浏览器依次打开:  
-http://eureka.server.one:8806/  
-http://eureka.server.two:8807/  
-http://eureka.server.three:8808/  
+http://127.0.0.1:8806/  
+http://127.0.0.1:8807/  
+http://127.0.0.1:8808/  
 界面效果如下：
 ![](https://raw.githubusercontent.com/lk6678979/lk-spring-eureka-server/master/lk-eureka-server/readme/springcloudui.png)  
 	

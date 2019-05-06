@@ -125,9 +125,9 @@ management:
 #### 2.3.1 使用maven打包项目
 #### 2.3.2 启动jar
 依次执行下面指令启动3个集群的注册中心：  
-	java -jar lk-eureka-server-0.0.1-SNAPSHOT.jar --spring.profiles.active=one  
-	java -jar lk-eureka-server-0.0.1-SNAPSHOT.jar --spring.profiles.active=two  
-	java -jar lk-eureka-server-0.0.1-SNAPSHOT.jar --spring.profiles.active=three
+	java -jar eureka-server-1.0.0.jar --spring.profiles.active=one  
+	java -jar eureka-server-1.0.0.jar --spring.profiles.active=two  
+	java -jar eureka-server-1.0.0.jar --spring.profiles.active=three
 #### 2.3.3 域名配置
 在计算机host目录下添加3个hostname：  
 127.0.0.1 eureka.server.one  

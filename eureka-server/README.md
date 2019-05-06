@@ -139,5 +139,5 @@ http://127.0.0.1:8806/
 http://127.0.0.1:8807/  
 http://127.0.0.1:8808/  
 界面效果如下：
-![](https://raw.githubusercontent.com/lk6678979/lk-spring-eureka-server/master/lk-eureka-server/readme/springcloudui.png)  
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/eureka-ui.png)  
 	

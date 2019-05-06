@@ -4,7 +4,7 @@
 
 ### 1.2 创建完的工程pom.xml文件中的依赖如下：
 
-```
+```xml
  <!-- 继承springboot项目-->
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -66,7 +66,7 @@
 
 ## 2.代码编写
 ### 2.1 JAVA代码，仅需要在springboot工程的启动application类上添加`@EnableEurekaServer`注解：
-```
+```java
 package com.owp.eureka;
 
 import org.springframework.boot.SpringApplication;
@@ -83,7 +83,7 @@ public class Application {
 
 ```
 ### 2.2 创建3个配置文件，applycation-one.yml,applycation-two.yml,applycation-three.yml(用于注册中心高可用集群)，其中一个配置文件如下，3个配置文件指定不同的server.port，并在defaultZone中配置其他2个yml启动的服务器的ip端口
-```
+```yml
 server:
   #服务启动端口号
   port: 8806

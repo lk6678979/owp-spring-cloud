@@ -268,9 +268,9 @@ management:
 #### 2.3.1 使用maven打包项目
 #### 2.3.2 启动jar
 依次执行下面指令启动3个集群的注册中心：  
-java -jar config-server-1.0.0.jar --server.port=8409 
-java -jar config-server-1.0.0.jar --server.port=8410 
-java -jar config-server-1.0.0.jar --server.port=8411 
+java -jar config-server-1.0.0.jar --server.port=8409  
+java -jar config-server-1.0.0.jar --server.port=8410  
+java -jar config-server-1.0.0.jar --server.port=8411  
 ## 2.前端测试获取配置文件
 在浏览器依次打开:  
 http://http://127.0.0.1:8409/demo/dev/master/  

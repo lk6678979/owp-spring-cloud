@@ -1,0 +1,44 @@
+logging:
+  config: classpath:logback-spring.xml
+#服务启动端口号
+server:
+  port: 8409
+spring:
+  profiles:
+    active: @spring.profiles.active@
+##使用git作为配置中心时，删除下面所有配置，修改spring.profiles.active为git-dev或者git-pro
+  application:
+    name: config-center
+  cloud:
+    config:
+      server:
+        native:
+          searchLocations: file:/srv/conf/
+    bus:
+      enabled: true
+  #mq连接信息
+  rabbitmq:
+    host: @rabbitmq.host@
+    port: 5672
+    username: sziov
+    password: sziov
+eureka:
+  instance:
+    health-check-url-path: /actuator/health
+    #设置当前实例的主机名称(说明：该host将会在服务调用时使用，调用方需要配置该host对应的ip)
+    #如果不想使用host使用ip在注册使用，则配置eureka.instance.perferIpAddress=true
+    #preferIpAddress: true
+    preferIpAddress: true
+  client:
+    serviceUrl:
+      defaultZone: @eureka.defaultZone@
+management:
+  endpoints:
+    web:
+      exposure:
+        #开放所有页面节点  默认只开启了health、info两个节点，注意yml的*要使用双引号
+        include: "*"
+  endpoint:
+    health:
+      #显示健康具体信息  默认不会显示详细信息
+      show-details: always

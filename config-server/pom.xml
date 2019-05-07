@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.owp</groupId>
+    <artifactId>config-server</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>config-server</name>
+
+    <!-- 继承springboot项目-->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.3.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <properties>
+        <java.version>1.8</java.version>
+        <spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
+        <spring_boot.version>2.0.3.RELEASE</spring_boot.version>
+    </properties>
+
+    <dependencies>
+        <!-- 消息总线jar-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-bus</artifactId>
+        </dependency>
+        <!-- 消息总线依赖rabbitmq-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+        </dependency>
+        <!-- 配置中心核心依赖jar-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-config-server</artifactId>
+        </dependency>
+        <!-- eureka客户端核心jar-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+    </dependencies>
+
+    <!-- springCloud版本依赖-->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 是否打包为可执行jar包-->
+                    <executable>true</executable>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <!-- 本地配置(git方式) -->
+        <profile>
+            <id>local</id>
+            <properties>
+                <env>local</env>
+                <rabbitmq.host>10.88.25.17</rabbitmq.host>
+                <spring.profiles.active>local</spring.profiles.active>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <!-- 开发环境(git方式) -->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <env>dev</env>
+                <rabbitmq.host>10.88.25.17</rabbitmq.host>
+                <spring.profiles.active>dev</spring.profiles.active>
+            </properties>
+        </profile>
+        <!-- 阿里云测试环境-->
+        <profile>
+            <id>test</id>
+            <properties>
+                <env>test</env>
+                <spring.profiles.active>native</spring.profiles.active>
+                <rabbitmq.host>10.88.25.17</rabbitmq.host>
+                <eureka.defaultZone>
+                    http://192.168.10.6:8806/eureka/,http://192.168.10.6:8807/eureka/
+                </eureka.defaultZone>
+            </properties>
+        </profile>
+        <!-- 广乘腾讯云生产环境-->
+        <profile>
+            <id>pro</id>
+            <properties>
+                <env>pro</env>
+                <spring.profiles.active>native</spring.profiles.active>
+                <rabbitmq.host>10.88.25.17</rabbitmq.host>
+                <eureka.defaultZone>
+                    http://192.168.0.4:8806/eureka/,http://192.168.0.5:8806/eureka/
+                </eureka.defaultZone>
+            </properties>
+        </profile>
+    </profiles>
+</project>

@@ -7,6 +7,8 @@
     <groupId>com.owp</groupId>
     <artifactId>eureka-server</artifactId>
     <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>eureka-server</name>
 
     <!-- 继承springboot项目-->
     <parent>
@@ -28,16 +30,16 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-        <!-- springCloud eureka注册中心核心jar -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
-        </dependency>
         <!-- springboot的测试依赖jar-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <!-- springCloud eureka注册中心核心jar -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
         </dependency>
     </dependencies>
 

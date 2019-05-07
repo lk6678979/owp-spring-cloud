@@ -1,0 +1,57 @@
+logging:
+  config: classpath:logback-spring.xml
+#服务启动端口号
+server:
+  port: 8409
+
+spring:
+  application:
+    name: config-center
+  cloud:
+    config:
+      server:
+        git:
+          #Git仓库地址
+          #仓库地址下文件所属目录,可以直接在浏览器输入ip:post/{application}/{profile}等地址获取配置文件，文件名的-会自动被/识别为profile属性
+          #配置文件只识别properties和yml，建议使用yml，可以处理中文乱码
+          #获取git上的资源信息遵循如下规则
+          #/{application}/{profile}[/{label}]
+          #/{application}-{profile}.yml
+          #/{label}/{application}-{profile}.yml
+          #/{application}-{profile}.properties
+          #/{label}/{application}-{profile}.properties
+          uri: http://192.168.0.89/icos/config-center-resource.git
+          #{application}对应调用服务中心的其他服务的ID，spring.application.name,
+          #前面一定要加/斜杠，源码是根据/识别的，然后使用string.replace去替换｛application｝
+          #见源码AbstractScmAccessor.getSearchPaths（），和AbstractScmAccessor.getSearchLocations()方法
+          #git路径下的目录
+          search-paths: /{application}
+          username: config
+          password: spring2018
+    bus:
+      enabled: true
+  #mq连接信息
+  rabbitmq:
+    host: @rabbitmq.host@
+    port: 5672
+    username: sziov
+    password: sziov
+eureka:
+  instance:
+    health-check-url-path: /actuator/health
+    #设置当前实例的主机名称(说明：该host将会在服务调用时使用，调用方需要配置该host对应的ip)
+    #如果不想使用host使用ip在注册使用，则配置eureka.instance.perferIpAddress=true
+    #preferIpAddress: true
+    preferIpAddress: true
+  client:
+    serviceUrl:
+      defaultZone: http://192.168.0.90:8806/eureka/,http://192.168.0.90:8807/eureka/
+management:
+  endpoints:
+      exposure:
+        #开放所有页面节点  默认只开启了health、info两个节点，注意yml的*要使用双引号
+        include: "*"
+  endpoint:
+    health:
+      #显示健康具体信息  默认不会显示详细信息
+      show-details: always

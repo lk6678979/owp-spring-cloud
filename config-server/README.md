@@ -262,7 +262,7 @@ management:
       show-details: ALWAYS
 ```
 说明：  
-    1.如果不需要使用mq做消息总线，可以去掉rabbitmq和management配置，pom中也去掉对应部分，但是在更新配置文件时，就需要每个使用配置中心的客户端都去做刷新操作/bus/refresh  
+    1.如果不需要使用mq做消息总线，可以去掉rabbitmq和management配置，pom中也去掉对应部分，但是在更新配置文件时，就需要每个使用配置中心的客户端都去做刷新操作/actuator/bus-refresh  
 2.`GIT上的配置文件名称的格式都是application-profile,配置中心也是根据uri/search-paths/name-profire的格式寻找配置文件,其中name和profire是【调用方】属性，在配置文件中配置，name在【调用方】如果不设置就是该服务的spring.application.name`
 ### 2.3 启动
 #### 2.3.1 使用maven打包项目

@@ -117,53 +117,99 @@ rabbitmqctl stop
 ![](https://raw.githubusercontent.com/lk6678979/lk-spring-eureka-server/master/lk-eureka-server/readme/configjg.png)  
 
 ## 1. 项目创建、工程pom.xml文件中的依赖如下：
-```
-<dependencies>
-	<dependency>
-		<groupId>org.springframework.cloud</groupId>
-		<artifactId>spring-cloud-config-server</artifactId>
-	</dependency>
-	<dependency>
-		<groupId>org.springframework.cloud</groupId>
-		<artifactId>spring-cloud-starter-eureka</artifactId>
-	</dependency>
-	<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-test</artifactId>
-		<scope>test</scope>
-	</dependency>
-	<!--基于MQ的配置实时更新依赖表!开始-->
-	<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-actuator</artifactId>
-	</dependency>
-	<dependency>
-		<groupId>org.springframework.cloud</groupId>
-		<artifactId>spring-cloud-starter-bus-amqp</artifactId>
-	</dependency>
-	<!--基于MQ的配置实时更新依赖表!结束-->
-</dependencies>
+```xml
+<!-- 继承springboot项目-->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.3.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <properties>
+        <java.version>1.8</java.version>
+        <spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
+        <spring_boot.version>2.0.3.RELEASE</spring_boot.version>
+    </properties>
+
+    <dependencies>
+        <!-- 消息总线jar-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-bus</artifactId>
+        </dependency>
+        <!-- 消息总线依赖rabbitmq-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+        </dependency>
+        <!-- 配置中心核心依赖jar-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-config-server</artifactId>
+        </dependency>
+        <!-- eureka客户端核心jar-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+    </dependencies>
+
+    <!-- springCloud版本依赖-->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 是否打包为可执行jar包-->
+                    <executable>true</executable>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 ```
 
 ## 2.代码编写
 ### 2.1 JAVA代码，仅需要在springboot工程的启动application类上添加`@EnableEurekaServer`和`@EnableEurekaClient`注解：
-```
+```java
+package com.owp.config;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.config.server.EnableConfigServer;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+
 @SpringBootApplication
 @EnableConfigServer
 @EnableEurekaClient
-public class ConfigServerApplication {
-	public static void main(String[] args) {
-		SpringApplication.run(ConfigServerApplication.class, args);
-	}
+public class ConfigCenterApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ConfigCenterApplication.class, args);
+    }
 }
+
 ```
-### 2.2 创建3个配置文件，applycation.yml
-```
-#服务启动端口号
+### 2.2 创建配置文件，applycation.yml
+```yml
+logging:
+  config: classpath:logback-spring-local.xml
 #服务启动端口号
 server:
   port: 8409
-
 spring:
   application:
     name: config-server
@@ -180,28 +226,40 @@ spring:
           #/{label}/{application}-{profile}.yml
           #/{application}-{profile}.properties
           #/{label}/{application}-{profile}.properties
-          uri: https://gitlab.com/lk-spring/config-center.git
+          uri: http://192.168.0.89/icos/config-center-resource.git
           #{application}对应调用服务中心的其他服务的ID，spring.application.name,
           #前面一定要加/斜杠，源码是根据/识别的，然后使用string.replace去替换｛application｝
           #见源码AbstractScmAccessor.getSearchPaths（），和AbstractScmAccessor.getSearchLocations()方法
           #git路径下的目录
           search-paths: /{application}
-          username: 6678979@qq.com
-          password: liu2kai3...
+          username: config
+          password: spring2018
   #mq连接信息
   rabbitmq:
-    host: 39.108.128.40
+    host: @rabbitmq.host@
     port: 5672
-    username: lklcl
-    password: liu2kai3
-#刷新配置时去掉验证，不设置会报错
-management:
-  security:
-    enabled: false
+    username: sziov
+    password: sziov
 eureka:
+  instance:
+    health-check-url-path: /actuator/health
+    #设置当前实例的主机名称(说明：该host将会在服务调用时使用，调用方需要配置该host对应的ip)
+    #如果不想使用host使用ip在注册使用，则配置eureka.instance.perferIpAddress=true
+    #preferIpAddress: true
+    preferIpAddress: true
   client:
     serviceUrl:
-      defaultZone: http://eureka.server.one:8806/eureka/,http://eureka.server.two:8807/eureka/,http://eureka.server.three:8808/eureka/
+      defaultZone: http://127.0.0.1:8806/eureka/,http://127.0.0.1:8807/eureka/
+management:
+  endpoints:
+    web:
+      exposure:
+        #开放所有页面节点  默认只开启了health、info两个节点，注意yml的*要使用双引号
+        include: "*"
+  endpoint:
+    health:
+      #显示健康具体信息  默认不会显示详细信息
+      show-details: ALWAYS
 ```
 说明：  
     1.如果不需要使用mq做消息总线，可以去掉rabbitmq和management配置，pom中也去掉对应部分，但是在更新配置文件时，就需要每个使用配置中心的客户端都去做刷新操作/bus/refresh  
@@ -210,9 +268,9 @@ eureka:
 #### 2.3.1 使用maven打包项目
 #### 2.3.2 启动jar
 依次执行下面指令启动3个集群的注册中心：  
-java -jar lk-config-server-0.0.1-SNAPSHOT.jar --server.port=8409  
-java -jar lk-config-server-0.0.1-SNAPSHOT.jar --server.port=8410  
-java -jar lk-config-server-0.0.1-SNAPSHOT.jar --server.port=8411  
+java -jar config-server-1.0.0.jar --server.port=8409
+java -jar config-server-1.0.0.jar --server.port=8410
+java -jar config-server-1.0.0.jar --server.port=8411 
 ## 2.前端测试获取配置文件
 在浏览器依次打开:  
 http://http://127.0.0.1:8409/demo/dev/master/  
@@ -225,5 +283,52 @@ http://http://127.0.0.1:8411/demo/dev/master/
 ### 方式一(手动)：使用/bus/refresh刷新，例如：http://http://127.0.0.1:8409/bus/refresh
 ### 方式二（GIT）：使用GIT的webhooks,直接在GIT上面的搜索栏搜索webhooks，PS：官网的免费版本没有这个功能
 
-
+# 三、 本地模式，配置application.yml
+```yml
+logging:
+  config: classpath:logback-spring.xml
+#服务启动端口号
+server:
+  port: 8409
+spring:
+  profiles:
+    #本地模式固定写法，这里必须是native会读取本配置文件下cloud.config的配置使用本地文件作为配置中心
+    active: native
+##使用git作为配置中心时，删除下面所有配置，修改spring.profiles.active为git-dev或者git-pro
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        native:
+          searchLocations: file:/srv/conf/
+    bus:
+      enabled: true
+  #mq连接信息
+  rabbitmq:
+    host: @rabbitmq.host@
+    port: 5672
+    username: sziov
+    password: sziov
+eureka:
+  instance:
+    health-check-url-path: /actuator/health
+    #设置当前实例的主机名称(说明：该host将会在服务调用时使用，调用方需要配置该host对应的ip)
+    #如果不想使用host使用ip在注册使用，则配置eureka.instance.perferIpAddress=true
+    #preferIpAddress: true
+    preferIpAddress: true
+  client:
+    serviceUrl:
+      defaultZone: @eureka.defaultZone@
+management:
+  endpoints:
+    web:
+      exposure:
+        #开放所有页面节点  默认只开启了health、info两个节点，注意yml的*要使用双引号
+        include: "*"
+  endpoint:
+    health:
+      #显示健康具体信息  默认不会显示详细信息
+      show-details: always
+```
 	

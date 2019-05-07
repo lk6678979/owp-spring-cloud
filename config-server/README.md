@@ -280,7 +280,8 @@ http://http://127.0.0.1:8411/demo/dev/master/
 ![](https://raw.githubusercontent.com/lk6678979/lk-spring-eureka-server/master/lk-eureka-server/readme/configdemo.png)  
 
 ## 3.修改配置后实时刷新  
-### 方式一(手动)：使用/bus/refresh刷新，例如：http://127.0.0.1:8409/actuator/bus-refresh
+### 方式一(手动)：使用actuator/bus-refresh刷新，例如：http://127.0.0.1:8409/actuator/bus-refresh
+#### 说明：如果监控前缀改成了其他，例如/actuator2,那么bus刷新路径为ip:port/actuator2/bus-refresh
 ### 方式二（GIT）：使用GIT的webhooks,直接在GIT上面的搜索栏搜索webhooks，PS：官网的免费版本没有这个功能
 
 # 三、 本地模式，配置application.yml

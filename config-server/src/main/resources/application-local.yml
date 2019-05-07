@@ -3,10 +3,9 @@ logging:
 #服务启动端口号
 server:
   port: 8409
-
 spring:
   application:
-    name: config-center
+    name: config-server
   cloud:
     config:
       server:
@@ -43,7 +42,7 @@ eureka:
     preferIpAddress: true
   client:
     serviceUrl:
-      defaultZone: http://127.0.0.1:8806/eureka/,http://127.0.0.1:8807/eureka/
+      defaultZone: @eureka.defaultZone@
 management:
   endpoints:
     web:

@@ -74,33 +74,38 @@
     </build>
     <profiles>
         <!-- 本地配置(git方式) -->
+        <!-- 本地环境配置 -->
         <profile>
             <id>local</id>
             <properties>
                 <env>local</env>
-                <rabbitmq.host>10.88.25.17</rabbitmq.host>
-                <spring.profiles.active>local</spring.profiles.active>
+                <rabbitmq.host>192.168.0.90</rabbitmq.host>
+                <eureka.defaultZone>
+                    http://127.0.0.1:8806/eureka/,http://127.0.0.1:8807/eureka/
+                </eureka.defaultZone>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
         </profile>
-        <!-- 开发环境(git方式) -->
-        <profile>
-            <id>dev</id>
-            <properties>
-                <env>dev</env>
-                <rabbitmq.host>10.88.25.17</rabbitmq.host>
-                <spring.profiles.active>dev</spring.profiles.active>
-            </properties>
-        </profile>
+    <!-- 开发环境 -->
+    <profile>
+        <id>dev</id>
+        <properties>
+            <env>dev</env>
+            <rabbitmq.host>192.168.0.90</rabbitmq.host>
+            <eureka.defaultZone>
+                http://192.168.0.90:8806/eureka/,http://192.168.0.90:8807/eureka/
+            </eureka.defaultZone>
+        </properties>
+    </profile>
         <!-- 阿里云测试环境-->
         <profile>
             <id>test</id>
             <properties>
                 <env>test</env>
                 <spring.profiles.active>native</spring.profiles.active>
-                <rabbitmq.host>10.88.25.17</rabbitmq.host>
+                <rabbitmq.host>192.168.10.6</rabbitmq.host>
                 <eureka.defaultZone>
                     http://192.168.10.6:8806/eureka/,http://192.168.10.6:8807/eureka/
                 </eureka.defaultZone>
@@ -112,7 +117,7 @@
             <properties>
                 <env>pro</env>
                 <spring.profiles.active>native</spring.profiles.active>
-                <rabbitmq.host>10.88.25.17</rabbitmq.host>
+                <rabbitmq.host>192.168.0.5</rabbitmq.host>
                 <eureka.defaultZone>
                     http://192.168.0.4:8806/eureka/,http://192.168.0.5:8806/eureka/
                 </eureka.defaultZone>

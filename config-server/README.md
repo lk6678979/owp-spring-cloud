@@ -275,9 +275,9 @@ java -jar config-server-1.0.0.jar --server.port=8410
 java -jar config-server-1.0.0.jar --server.port=8411  
 ## 2.前端测试获取配置文件
 在浏览器依次打开:  
-http://127.0.0.1:8409/monitor-center  
-http://127.0.0.1:8410/monitor-center  
-http://127.0.0.1:8411/monitor-center  
+http://127.0.0.1:8409/monitor-center/local/master  
+http://127.0.0.1:8410/monitor-center/local/master  
+http://127.0.0.1:8411/monitor-center/local/master  
 界面效果如下：
 ![](https://github.com/lk6678979/image/blob/master/spring-cloud/config-ui.png)  
 

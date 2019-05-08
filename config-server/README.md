@@ -133,12 +133,12 @@ rabbitmqctl stop
     </properties>
 
     <dependencies>
-        <!-- 消息总线jar-->
+        <!-- 消息总线jar，如果不使用消息总线，可以不配置-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-bus</artifactId>
         </dependency>
-        <!-- 消息总线依赖rabbitmq-->
+        <!-- 消息总线依赖rabbitmq，如果不使用消息总线，可以不配置-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
@@ -236,7 +236,7 @@ spring:
           username:
           #git密码（public项目不用设置）
           password:
-  #mq连接信息
+  #mq连接信息，如果不使用消息总线，可以不配置
   rabbitmq:
     host: @rabbitmq.host@
     port: 5672

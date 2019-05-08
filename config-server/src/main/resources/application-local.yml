@@ -19,14 +19,16 @@ spring:
           #/{label}/{application}-{profile}.yml
           #/{application}-{profile}.properties
           #/{label}/{application}-{profile}.properties
-          uri: http://192.168.0.89/icos/config-center-resource.git
+          uri: https://github.com/lk6678979/config-center.git
           #{application}对应调用服务中心的其他服务的ID，spring.application.name,
           #前面一定要加/斜杠，源码是根据/识别的，然后使用string.replace去替换｛application｝
           #见源码AbstractScmAccessor.getSearchPaths（），和AbstractScmAccessor.getSearchLocations()方法
           #git路径下的目录
           search-paths: /{application}
-          username: config
-          password: spring2018
+          #git帐号（public项目不用设置）
+          username:
+          #git密码（public项目不用设置）
+          password:
   #mq连接信息
   rabbitmq:
     host: @rabbitmq.host@

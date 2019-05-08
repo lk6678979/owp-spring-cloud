@@ -226,17 +226,19 @@ spring:
           #/{label}/{application}-{profile}.yml
           #/{application}-{profile}.properties
           #/{label}/{application}-{profile}.properties
-          uri: http://192.168.0.89/icos/config-center-resource.git
+          uri: https://github.com/lk6678979/config-center.git
           #{application}对应调用服务中心的其他服务的ID，spring.application.name,
           #前面一定要加/斜杠，源码是根据/识别的，然后使用string.replace去替换｛application｝
           #见源码AbstractScmAccessor.getSearchPaths（），和AbstractScmAccessor.getSearchLocations()方法
           #git路径下的目录
           search-paths: /{application}
-          username: config
-          password: spring2018
+          #git帐号（public项目不用设置）
+          username:
+          #git密码（public项目不用设置）
+          password:
   #mq连接信息
   rabbitmq:
-    host: 192.168.0.90
+    host: @rabbitmq.host@
     port: 5672
     username: sziov
     password: sziov
@@ -273,11 +275,11 @@ java -jar config-server-1.0.0.jar --server.port=8410
 java -jar config-server-1.0.0.jar --server.port=8411  
 ## 2.前端测试获取配置文件
 在浏览器依次打开:  
-http://http://127.0.0.1:8409/demo/dev/master/  
-http://http://127.0.0.1:8410/demo/dev/master/  
-http://http://127.0.0.1:8411/demo/dev/master/  
+http://127.0.0.1:8409/monitor-center/local/master  
+http://127.0.0.1:8410/monitor-center/local/master  
+http://127.0.0.1:8411/monitor-center/local/master  
 界面效果如下：
-![](https://raw.githubusercontent.com/lk6678979/lk-spring-eureka-server/master/lk-eureka-server/readme/configdemo.png)  
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/config-ui-2.png)  
 
 ## 3.修改配置后实时刷新  
 ### 方式一(手动)：使用actuator/bus-refresh刷新，例如：http://127.0.0.1:8409/actuator/bus-refresh

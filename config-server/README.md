@@ -279,7 +279,7 @@ http://127.0.0.1:8409/monitor-center/local/master
 http://127.0.0.1:8410/monitor-center/local/master  
 http://127.0.0.1:8411/monitor-center/local/master  
 界面效果如下：
-![](https://github.com/lk6678979/image/blob/master/spring-cloud/config-ui.png)  
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/config-ui-2.png)  
 
 ## 3.修改配置后实时刷新  
 ### 方式一(手动)：使用actuator/bus-refresh刷新，例如：http://127.0.0.1:8409/actuator/bus-refresh

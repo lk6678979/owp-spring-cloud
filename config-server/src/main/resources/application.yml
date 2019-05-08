@@ -17,7 +17,7 @@ spring:
 #          searchLocations: file:/srv/conf/
 #    bus:
 #      enabled: true
-#  #mq连接信息
+#  #mq连接信息，如果不使用消息总线，可以不配置
 #  rabbitmq:
 #    host: @rabbitmq.host@
 #    port: 5672

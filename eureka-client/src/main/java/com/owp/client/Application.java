@@ -12,6 +12,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 //@EnableEurekaClient
 //@EnableDiscoveryClient支持所有类型的注册中心
 @EnableDiscoveryClient
+//@EnableFeignClients是Feign远程调用所需配置，一般都会使用，后面再介绍
 @EnableFeignClients
 public class Application {
 

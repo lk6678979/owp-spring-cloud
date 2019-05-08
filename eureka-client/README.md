@@ -89,7 +89,7 @@ public class Application {
 }
 ```
 `@EnableFeignClients是Feign远程调用所需配置，一般都会使用，后面再介绍`
-```kava
+```java
 @RestController
 @RequestMapping("/demo")
 public class DemoController {
@@ -129,7 +129,6 @@ eureka:
       defaultZone: http://127.0.0.1:8806/eureka/,http://127.0.0.1:8807/eureka/
 
 ```
-```
 # 5 启动
 ## 5.1 使用maven打包项目
 ## 5.2 启动jar
@@ -137,5 +136,7 @@ eureka:
 java -jar eureka-client-1.0.0.jar --server.port=9999  
 java -jar eureka-client-1.0.0.jar --server.port=9998  
 java -jar eureka-client-1.0.0.jar --server.port=9997  
-## 5.3 在服务注册中的前端页面可以看到注册的3个服务
+## 5.3 在服务注册中的前端页面可以看到注册的服务
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/eureka-client-center.png) 
 ## 5.4 浏览器输入127.0.0.1:9999/demo/hello?name=222返回数据
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/eureka-client.png) 

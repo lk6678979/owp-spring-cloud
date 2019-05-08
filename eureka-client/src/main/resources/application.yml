@@ -1,0 +1,22 @@
+logging:
+  #日志配置路径
+  config: classpath:logback-spring-local.xml
+server:
+  port: 9999
+spring:
+  application:
+    name: eureka-client
+eureka:
+  instance:
+    #设置当前实例的主机名称(说明：该host将会在服务调用时使用，调用方需要配置该host对应的ip)
+    #如果不想使用host使用ip在注册使用，则配置eureka.instance.perferIpAddress=true
+    #preferIpAddress: true
+    health-check-url-path: /actuator/health
+    perferIpAddress: true
+    #ipAddress: 192.168.0.40
+  client:
+    #指定服务注册中心地址，这里使用3个注册中心相互注册实现集群
+    #配置中心，客户端访问，eureka.client.serviceUrl.defaultZone必须在bootstrap下面,
+    #必须和spring.cloud.config.discovery.enabled、spring.cloud.config.discovery.serviceId写在一个文件里
+   serviceUrl:
+      defaultZone: http://127.0.0.1:8806/eureka/,http://127.0.0.1:8807/eureka/

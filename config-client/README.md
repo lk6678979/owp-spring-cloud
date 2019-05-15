@@ -1,4 +1,4 @@
-# spingcloud配置服务中心
+# spingcloud客户端（使用配置中心）
 ## 1. 项目创建、工程pom.xml文件中的依赖如下：
 ```yml
 <!-- 继承springboot项目-->
@@ -191,7 +191,7 @@ public class DemoController {
     String sex;
 
     @GetMapping("/hello")
-    public String demoHello(@RequestParam String name) {
+    public String demoHello() {
         return "姓名：" + name + ",性别:" + sex;
     }
 }
@@ -205,12 +205,36 @@ public class DemoController {
 java -jar config-client-1.0.0.jar --server.port=8301  
 java -jar config-client-1.0.0.jar --server.port=8302  
 java -jar config-client-1.0.0.jar --server.port=8303  
-#### 3.3 前端测试获取配置文件
-* <h4>在浏览器依次打开:</h4>  
+### 3.3 前端测试获取配置文件
+#### 在浏览器依次打开:
 http://127.0.0.1:8301/demo  
 http://127.0.0.1:8302/demo  
 http://127.0.0.1:8303/demo  
-* <h4>git上的配置文件如下：</h4> 
-![](https://raw.githubusercontent.com/lk6678979/lk-spring-eureka-server/master/lk-eureka-server/readme/democonfig.jpg)
-* <h4>浏览器访问结果如下：</h4> 
+#### git上的配置文件如下：
+```yml
+logging:
+  config: classpath:logback-spring-local.xml
+spring:
+  rabbitmq:
+      host: 192.168.0.90
+      port: 5672
+      username: sziov
+      password: sziov
+#忽略权限拦截，外部系统，例如springboot admin 和mq刷新配置都需要权限
+management:
+  endpoints:
+    web:
+      exposure:
+        #开放所有页面节点  默认只开启了health、info两个节点，注意yml的*要使用双引号
+        include: "*"
+  endpoint:
+    health:
+      #显示健康具体信息  默认不会显示详细信息
+      show-details: ALWAYS
+#自定义配置
+business: 
+  name: 张三
+  sex: 男
+```
+#### 浏览器访问结果如下：
 ![](https://raw.githubusercontent.com/lk6678979/lk-spring-eureka-server/master/lk-eureka-server/readme/demotestconfig.jpg)  

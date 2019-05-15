@@ -239,7 +239,7 @@ spring:
           password:
   #mq连接信息，如果不使用消息总线，可以不配置
   rabbitmq:
-    host: @rabbitmq.host@
+    host: 127.0.0.1
     port: 5672
     username: sziov
     password: sziov

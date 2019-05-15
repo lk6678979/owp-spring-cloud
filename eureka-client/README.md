@@ -137,6 +137,6 @@ java -jar eureka-client-1.0.0.jar --server.port=9999
 java -jar eureka-client-1.0.0.jar --server.port=9998  
 java -jar eureka-client-1.0.0.jar --server.port=9997  
 ## 5.3 在服务注册中的前端页面可以看到注册的服务
-![](https://github.com/lk6678979/image/blob/master/spring-cloud/eureka-client-center.png) 
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/eureka-client-center-2.png) 
 ## 5.4 浏览器输入127.0.0.1:9999/demo/hello?name=ezreal返回数据
-![](https://github.com/lk6678979/image/blob/master/spring-cloud/eureka-client.png) 
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/eureka-client-2.png) 

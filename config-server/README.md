@@ -112,7 +112,7 @@ rabbitmqctl stop
 ```
 
 # 二、 基于GIT、MQ的高可用配置中心
-# 写在前面，需要去git创建一个项目，然后将spring配置文件放到git中
+# 写在前面，需要去git创建一个项目，然后将spring配置文件放到git项目中
 # spingcloud配置服务中心
 ## 整体架构
 ![](https://raw.githubusercontent.com/lk6678979/lk-spring-eureka-server/master/lk-eureka-server/readme/configjg.png)  

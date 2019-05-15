@@ -237,4 +237,4 @@ business:
   sex: 男
 ```
 #### 浏览器访问结果如下：
-![](https://raw.githubusercontent.com/lk6678979/lk-spring-eureka-server/master/lk-eureka-server/readme/demotestconfig.jpg)  
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/config-client.jpg)  

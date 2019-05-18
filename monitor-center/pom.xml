@@ -10,7 +10,6 @@
     <packaging>jar</packaging>
     <name>monitor-center</name>
 
-
     <!-- 继承springboot项目-->
     <parent>
         <groupId>org.springframework.boot</groupId>

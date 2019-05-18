@@ -272,4 +272,4 @@ http://127.0.0.1:7000
 #### 服务墙：
 ![](https://github.com/lk6678979/image/blob/master/spring-cloud/admin-wall.jpg)  
 #### 服务详情：
-![](https://github.com/lk6678979/image/blob/master/spring-cloud/admin-login.jpg)  
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/admin-app-info.jpg)  

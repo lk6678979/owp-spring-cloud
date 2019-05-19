@@ -1,6 +1,6 @@
-# Hystrix仪表盘监控-基于turbine实现
+# Hystrix仪表盘监控-基于Turbine实现
 ## 1. 监控服务项目创建、工程pom.xml文件中的依赖如下：
-```yml
+```xml
  <!-- 继承springboot项目-->
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -100,11 +100,9 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 }
-
 ```
 ### 2.2 配置文件application.yml
-
-```
+```yml
 server:
   port: 8339
 logging:
@@ -164,68 +162,63 @@ turbine:
     1.`turbine.aggregator.cluster-config`配置的cluster名，在所有需要被监控的微服务中，要保持`eureka.instance.metadata-map.cluster`配置与这个值相同  
     2.需要被监控的服务的application.name需要在`turbine.app-config`中配置，逗号分隔多个name
 ## 3 被监控的客户端配置
+### 3.1 Pom添加依赖
+```xml
+        <!-- Hystrix监控依赖-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+        </dependency>
+```
+### 3.2 application.yml添加配置
+```yml
+eureka: 
+ instance: 
+  #自定义元数据：可以使用eureka.instance.metadata-map配置，
+  #这些元数据可以在远程客户端中访问，但是一般不改变客户端行为，
+  #除非客户端知道该元数据的含义。
+  metadata-map: 
+   #定义turbine监控中所属的集群名称
+   #需要和hystrix监控服务中的turbine.aggregator.cluster-config配置使用相同的值
+   cluster: owp-demo
+```
+### 3.3 配置UrlMappings(springboot2需要）
 ```java
 package com.owp.configclient;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.netflix.hystrix.contrib.metrics.eventstream.HystrixMetricsStreamServlet;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-@RestController
-@RequestMapping("/demo")
-public class DemoController {
-    @Value("${business.name}")
-    String name;
-
-    @Value("${business.sex}")
-    String sex;
-
-    @GetMapping("/hello")
-    public String demoHello() {
-        return "姓名：" + name + ",性别:" + sex;
+@Configuration
+public class HystrixConfig {
+    @Bean
+    public ServletRegistrationBean getServlet(){
+        HystrixMetricsStreamServlet streamServlet = new HystrixMetricsStreamServlet();
+        ServletRegistrationBean registrationBean = new ServletRegistrationBean(streamServlet);
+        registrationBean.setLoadOnStartup(1);
+        registrationBean.addUrlMappings("/actuator/hystrix.stream");
+        registrationBean.setName("HystrixMetricsStreamServlet");
+        return registrationBean;
     }
 }
 
 ```
-## 3 启动
-### 3.1 使用maven打包项目
-### 3.2 启动jar
-依次执行下面指令启动3个集群的注册中心：  
-java -jar config-client-1.0.0.jar --server.port=8301  
-java -jar config-client-1.0.0.jar --server.port=8302  
-java -jar config-client-1.0.0.jar --server.port=8303  
-### 3.3 前端测试获取配置文件
-#### 在浏览器依次打开:
-http://127.0.0.1:8301/demo  
-http://127.0.0.1:8302/demo  
-http://127.0.0.1:8303/demo  
-#### git上的配置文件如下：
-```yml
-logging:
-  config: classpath:logback-spring-local.xml
-spring:
-  rabbitmq:
-      host: 192.168.0.90
-      port: 5672
-      username: sziov
-      password: sziov
-#忽略权限拦截，外部系统，例如springboot admin 和mq刷新配置都需要权限
-management:
-  endpoints:
-    web:
-      exposure:
-        #开放所有页面节点  默认只开启了health、info两个节点，注意yml的*要使用双引号
-        include: "*"
-  endpoint:
-    health:
-      #显示健康具体信息  默认不会显示详细信息
-      show-details: ALWAYS
-#自定义配置
-business: 
-  name: 张三
-  sex: 男
-```
-#### 浏览器访问结果如下：
-![](https://github.com/lk6678979/image/blob/master/spring-cloud/config-client.jpg)  
+## 4 启动
+### 4.1 使用maven打包项目
+### 4.2 启动服务端
+java -jar hystrix-dashboard-1.0.0.jar --server.port=8339   
+### 4.3 启动客户端（这里我们使用前面搭建的config-client)
+java -jar config-client-1.0.0.jar --server.port=8301   
+### 4.4 前端测试
+#### 在浏览器查看监听（cluster参数和配置中保持一致）:
+http://127.0.0.1:8339/turbine.stream?cluster=owp-demo  
+ ![](https://github.com/lk6678979/image/blob/master/spring-cloud/hystrix-listent.png)
+ #### 在浏览器查看监听UI
+http://127.0.0.1:8339/hystrix/  
+ ![](https://github.com/lk6678979/image/blob/master/spring-cloud/hystrix-ui.jpg)
+#### 输入参数后进入详情页面：
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/hystrix-detail.jpg)  
+#### UI说明：
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/hystrixs.jpg)  

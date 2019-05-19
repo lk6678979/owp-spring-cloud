@@ -217,8 +217,9 @@ http://127.0.0.1:8339/turbine.stream?cluster=owp-demo
  ![](https://github.com/lk6678979/image/blob/master/spring-cloud/hystrix-listent.png)
  #### 在浏览器查看监听UI
 http://127.0.0.1:8339/hystrix/  
- ![](https://github.com/lk6678979/image/blob/master/spring-cloud/hystrix-ui.jpg)
+ ![](https://github.com/lk6678979/image/blob/master/spring-cloud/hystrix-ui.png)
 #### 输入参数后进入详情页面：
-![](https://github.com/lk6678979/image/blob/master/spring-cloud/hystrix-detail.jpg)  
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/hystrix-detail.png)  
 #### UI说明：
-![](https://github.com/lk6678979/image/blob/master/spring-cloud/hystrixs.jpg)  
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/hystrixs.png)  
+# 说明：只有在被监控的微服务调用使用hystrix的接口后，才会有统计，例如使用feign并且配置了fallback

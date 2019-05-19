@@ -119,8 +119,8 @@ feign:
 ### 3.2 启动feign-server微服务和调用客户端，我们这俩使用前面的项目config-client
 ### 3.3 前端测试
 #### 在浏览器访问（正常调用）:
-http://127.0.0.1:8301/demo/feignDemo  
-![](https://github.com/lk6678979/image/blob/master/spring-cloud/feign-sueccess.jpg) 
+http://127.0.0.1:8501/config-client/demo/feignDemo?token=1  
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/feign-fail.jpg) 
 #### 关闭feign-server服务，让客户端无法使用feign正常调用，然后前端查看
-http://127.0.0.1:8301/demo/feignDemo  
-![](https://github.com/lk6678979/image/blob/master/spring-cloud/feign-fail.jpg)  
+http://127.0.0.1:8501/config-client/demo/feignDemo?token=1  
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/feign-success.jpg)  

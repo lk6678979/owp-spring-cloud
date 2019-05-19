@@ -1,7 +1,7 @@
-# spingcloud客户端（使用配置中心）
-## 1. 项目创建、工程pom.xml文件中的依赖如下：
+# Hystrix仪表盘监控-基于turbine实现
+## 1. 监控服务项目创建、工程pom.xml文件中的依赖如下：
 ```yml
-<!-- 继承springboot项目-->
+ <!-- 继承springboot项目-->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -34,28 +34,21 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
-        </dependency>
         <!-- eureka 客户端依赖 结束-->
-        <!-- 配置中心模式，客户端依赖 开始-->
-        <!-- 使用BUS总线，如果不使用消息总线，可以不配置-->
+        <!-- hystrix仪表盘依赖,基于turbine实现集群模式 开始 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-bus</artifactId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
         </dependency>
-        <!-- 使用RabbitMq作为BUS总线的MQ，如果不使用消息总线，可以不配置-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+            <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
         </dependency>
-        <!-- 配置中心核心类 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-config</artifactId>
+            <artifactId>spring-cloud-starter-netflix-turbine</artifactId>
         </dependency>
-        <!-- 配置中心模式，客户端依赖 结束-->
+        <!-- hystrix仪表盘依赖,基于turbine实现集群模式 结束 -->
     </dependencies>
 
     <dependencyManagement>
@@ -84,75 +77,52 @@
     </build>
 ```
 
-## 2.代码编写
-### 2.1 JAVA代码，只需要在Application类上添加`@EnableEurekaClient`或者`@EnableDiscoveryClient`注解
+## 2.服务端代码编写
+### 2.1 JAVA代码，只需要在Application类上添加`@EnableHystrixDashboard`,`@EnableTurbine`,`@EnableCircuitBreaker`注解
 ```java
-package com.owp.configclient;
+package com.owp.turbine;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.openfeign.EnableFeignClients;
-
-//import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboard;
+import org.springframework.cloud.netflix.turbine.EnableTurbine;
 
 @SpringBootApplication
-//可以使用@EnableEurekaClient和@EnableDiscoveryClient两种注解，
-//@EnableEurekaClient是Eureka注册中心专用
-//@EnableEurekaClient
-//@EnableDiscoveryClient支持所有类型的注册中心
 @EnableDiscoveryClient
-//@EnableFeignClients是Feign远程调用所需配置，一般都会使用，后面再介绍
-@EnableFeignClients
+@EnableHystrixDashboard
+@EnableTurbine
+@EnableCircuitBreaker
 public class Application {
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
 }
-```
-### 2.2 创建2个配置文件，applycation.yml,bootstrap.yml
-* <h4>`applycation.yml`(仅配置端口号，实际部署的时候一般会再次设置端口号，这里测试用)</h4> 
 
 ```
-#服务启动端口号
+### 2.2 配置文件application.yml
+
+```
 server:
-  port: 8301
-```
-* <h4>`bootstrap.yml`(优先于applycation.yml加载)</h4>
-
-```
-#bootstrap.yml中的配置会先于application.yml加载,
-#config部分的配置必须先于application.yml被加载
-#文件路径规则：name-profile
+  port: 8339
+logging:
+  config: classpath:logback-spring-local.xml
 spring:
   application:
-    name: demo
-  cloud:
-    config:
-      #配置名称，在spring本地其实默认对应的是项目名字，如果不设置会去取spring.application.name
-      #对应config-server端的{application}
-#bootstrap.yml中的配置会先于application.yml加载,
-#config部分的配置必须先于application.yml被加载
-#文件路径规则：name-profile
-spring:
-  application:
-    name: config-client
-  cloud:
-    config:
-      #配置名称，在spring本地其实默认对应的是项目名字，如果不设置会去取spring.application.name
-      #对应config-server端的{application}
-      name: config-client
-      #通过URL获取配置中心服务器
-      #uri: http://localhost:8409
-      label: master
-      #逗号分割多个profile
-      profile: local
-      #从springcloud的注册中心的服务中获取配置
-      discovery:
-        enabled: true
-        #注册到springcould注册中心的配置服务id
-        serviceId: config-server
+    name: hystrix-dashboard
+#忽略权限拦截，外部系统，例如springboot admin 和mq刷新配置都需要权限
+management:
+  endpoints:
+    web:
+      exposure:
+        #开放所有页面节点  默认只开启了health、info两个节点，注意yml的*要使用双引号
+        include: "*"
+  endpoint:
+    health:
+      #显示健康具体信息  默认不会显示详细信息
+      show-details: ALWAYS
 eureka:
   instance:
     #设置当前实例的主机名称(说明：该host将会在服务调用时使用，调用方需要配置该host对应的ip)
@@ -167,11 +137,33 @@ eureka:
     #必须和spring.cloud.config.discovery.enabled、spring.cloud.config.discovery.serviceId写在一个文件里
    serviceUrl:
       defaultZone: http://127.0.0.1:8806/eureka/,http://127.0.0.1:8807/eureka/
+#turbine配置
+turbine:
+  #可以让同一主机上的服务通过主机名与端口号的组合来进行区分，
+  #默认情况下会以host来区分不同的服务，这会使得在本机调试的时候，
+  #本机上的不同服务聚合成一个服务来统计
+  combine-host-port: true
+  #配置监控服务的列表，表明监控哪些服务多个使用","分割
+  app-config: config-client
+  #用于指定集群名称，当服务数量非常多的时候，可以启动多个Turbine服务来构建不同的聚合集群，
+  #而该参数可以用来区分这些不同的聚合集群，同时该参数值可以再Hystrix仪表盘中用来定位不同的聚合集群，
+  #只需在Hystrix Stream的URL中通过cluster参数来指定
+  #当clusterNameExpression: metadata['cluster']时，
+  #假设想要监控的应用配置了eureka.instance.metadata-map.cluster: ABC，
+  #则需要配置，同时turbine.aggregator.clusterConfig: ABC
+  cluster-name-expression: metadata['cluster']
+  aggregator:
+    #指定聚合哪些集群,多个使用","分割，默认为default
+    cluster-config: owp-demo
+  #Turbine的收集端点
+  #这里和被监控启动类里的 registrationBean.addUrlMappings("/hystrix.stream")一致
+  #springboot1.X默认是/hystrix.stream，2.0默认/actuator/hystrix.stream
+#  instanceUrlSuffix: /actuator/hystrix.stream
 ```
 说明：  
-    1.如果不需要使用mq做消息总线，可以去掉rabbitmq和management配置，pom中也去掉对应部分，但是在更新配置文件时，就需要每个使用配置中心的客户端都去做刷新操作/bus/refresh  
-2.`GIT上的配置文件名称的格式都是application-profile,配置中心也是根据uri/search-paths/name-profire的格式寻找配置文件，如果name如果不设置就是该服务的spring.application.name`
-### 2.3 测试属性读取的代码
+    1.`turbine.aggregator.cluster-config`配置的cluster名，在所有需要被监控的微服务中，要保持`eureka.instance.metadata-map.cluster`配置与这个值相同  
+    2.需要被监控的服务的application.name需要在`turbine.app-config`中配置，逗号分隔多个name
+## 3 被监控的客户端配置
 ```java
 package com.owp.configclient;
 

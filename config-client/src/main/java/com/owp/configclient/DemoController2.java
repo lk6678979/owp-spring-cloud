@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/demo")
 public class DemoController2 {
 
+    /**
+    * 通过注入的方式使用feign调用接口
+    */
     @Autowired
     private FeignServiceDemo feignServiceDemo;
 

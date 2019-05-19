@@ -1,0 +1,34 @@
+#bootstrap.yml中的配置会先于application.yml加载,
+#config部分的配置必须先于application.yml被加载
+#文件路径规则：name-profile
+spring:
+  application:
+    name: zuul-server
+  cloud:
+    config:
+      #配置名称，在spring本地其实默认对应的是项目名字，如果不设置会去取spring.application.name
+      #对应config-server端的{application}
+      name: zuul-server
+      #通过URL获取配置中心服务器
+      #uri: http://localhost:8409
+      label: master
+      #逗号分割多个profile
+      profile: local
+      #从springcloud的注册中心的服务中获取配置
+      discovery:
+        enabled: true
+        #注册到springcould注册中心的配置服务id
+        serviceId: config-server
+eureka:
+  instance:
+    #设置当前实例的主机名称(说明：该host将会在服务调用时使用，调用方需要配置该host对应的ip)
+    #如果不想使用host使用ip在注册使用，则配置eureka.instance.perferIpAddress=true
+    #preferIpAddress: true
+    preferIpAddress: true
+    health-check-url-path: /actuator/health
+  client:
+    #指定服务注册中心地址，这里使用3个注册中心相互注册实现集群
+    #配置中心，客户端访问，eureka.client.serviceUrl.defaultZone必须在bootstrap下面,
+    #必须和spring.cloud.config.discovery.enabled、spring.cloud.config.discovery.serviceId写在一个文件里
+   serviceUrl:
+    defaultZone: http://127.0.0.1:8806/eureka/,http://127.0.0.1:8807/eureka/

@@ -244,7 +244,7 @@ http://127.0.0.1:8339/hystrix/
 #### UI说明：
 ![](https://github.com/lk6678979/image/blob/master/spring-cloud/hystrixs.png)  
 ## 说明：只有在被监控的微服务调用使用hystrix的接口后，才会有统计，例如使用feign并且配置了fallback  
-# ⭐普通基于Turbine转为RabbitMQ实现
+# ⭐普通基于Turbine的监控转为RabbitMQ实现
 ### 1. 替换监控服务项目Pom依赖
 #### 1.1 原依赖
 ```xml

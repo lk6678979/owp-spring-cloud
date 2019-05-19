@@ -1,4 +1,4 @@
-# Hystrix仪表盘监控-基于Turbine实现
+# Hystrix仪表盘监控-基于Turbine和RabbitMQ实现
 ## 1. 监控服务项目创建、工程pom.xml文件中的依赖如下：
 ```xml
  <!-- 继承springboot项目-->
@@ -46,7 +46,17 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-turbine</artifactId>
+            <artifactId>spring-cloud-netflix-hystrix-stream</artifactId>
+        </dependency>
+        <!--RabbitMQ 依赖-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream-binder-rabbit</artifactId>
+        </dependency>
+        <!--聚合监控 stream 依赖-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-turbine-stream</artifactId>
         </dependency>
         <!-- hystrix仪表盘依赖,基于turbine实现集群模式 结束 -->
     </dependencies>
@@ -78,21 +88,21 @@
 ```
 
 ## 2.服务端代码编写
-### 2.1 JAVA代码，只需要在Application类上添加`@EnableHystrixDashboard`,`@EnableTurbine`,`@EnableCircuitBreaker`注解
+### 2.1 JAVA代码，只需要在Application类上添加`@EnableHystrixDashboard`,`@EnableTurbineStream`,`@EnableCircuitBreaker`注解
 ```java
-package com.owp.turbine;
+package com.owp.turbine.mq;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboard;
-import org.springframework.cloud.netflix.turbine.EnableTurbine;
+import org.springframework.cloud.netflix.turbine.stream.EnableTurbineStream;
 
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableHystrixDashboard
-@EnableTurbine
+@EnableTurbineStream
 @EnableCircuitBreaker
 public class Application {
 
@@ -100,6 +110,7 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 }
+
 ```
 ### 2.2 配置文件application.yml
 ```yml
@@ -110,6 +121,12 @@ logging:
 spring:
   application:
     name: hystrix-dashboard
+  #mq配置
+  rabbitmq:
+      host: 192.168.0.90
+      port: 5672
+      username: sziov
+      password: sziov
 #忽略权限拦截，外部系统，例如springboot admin 和mq刷新配置都需要权限
 management:
   endpoints:
@@ -169,6 +186,10 @@ turbine:
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-netflix-hystrix-stream</artifactId>
+        </dependency>
 ```
 ### 3.2 application.yml添加配置
 ```yml
@@ -222,4 +243,119 @@ http://127.0.0.1:8339/hystrix/
 ![](https://github.com/lk6678979/image/blob/master/spring-cloud/hystrix-detail.png)  
 #### UI说明：
 ![](https://github.com/lk6678979/image/blob/master/spring-cloud/hystrixs.png)  
-# 说明：只有在被监控的微服务调用使用hystrix的接口后，才会有统计，例如使用feign并且配置了fallback
+## 说明：只有在被监控的微服务调用使用hystrix的接口后，才会有统计，例如使用feign并且配置了fallback  
+# ----------------------------------------普通基于Turbine转为RabbitMQ实现--------------------------------------------
+### 1. 替换监控服务项目Pom依赖
+#### 1.1 原依赖
+```xml
+        <!-- hystrix仪表盘依赖,基于turbine实现集群模式 开始 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-turbine</artifactId>
+        </dependency>
+        <!-- hystrix仪表盘依赖,基于turbine实现集群模式 结束 -->
+```
+#### 1.2 新依赖
+```xml
+<!-- hystrix仪表盘依赖,基于turbine实现集群模式 开始 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-netflix-hystrix-stream</artifactId>
+        </dependency>
+        <!--RabbitMQ 依赖-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream-binder-rabbit</artifactId>
+        </dependency>
+        <!--聚合监控 stream 依赖-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-turbine-stream</artifactId>
+        </dependency>
+        <!-- hystrix仪表盘依赖,基于turbine实现集群模式 结束 -->
+```
+### 2.  监控服务的application.yml添加RabbitMQ配置
+```yml
+spring:
+  #mq配置
+  rabbitmq:
+      host: 192.168.0.90
+      port: 5672
+      username: sziov
+      password: sziov
+```
+### 3.  监控服务的Springboot启动类中`@EnableTurbine`替换为`@EnableTurbineStream`
+```java
+package com.owp.turbine.mq;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboard;
+import org.springframework.cloud.netflix.turbine.stream.EnableTurbineStream;
+
+@SpringBootApplication
+@EnableDiscoveryClient
+@EnableHystrixDashboard
+@EnableTurbineStream
+@EnableCircuitBreaker
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+```
+### 4.  被监控的服务的application.yml添加RabbitMQ配置
+```yml
+spring:
+  #mq配置
+  rabbitmq:
+      host: 192.168.0.90
+      port: 5672
+      username: sziov
+      password: sziov
+```
+### 5. 替换被监控服务项目Pom依赖
+#### 5.1 原依赖
+```xml
+        <!-- Hystrix监控依赖-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+        </dependency>
+```
+#### 5.2 新依赖
+```xml
+        <!-- Hystrix监控依赖-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-netflix-hystrix-stream</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+        </dependency>
+```
+

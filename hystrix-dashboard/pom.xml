@@ -7,6 +7,8 @@
     <groupId>com.owp</groupId>
     <artifactId>hystrix-dashboard</artifactId>
     <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>hystrix-dashboard</name>
 
     <!-- 继承springboot项目-->
     <parent>

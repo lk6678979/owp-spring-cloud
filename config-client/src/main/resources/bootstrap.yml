@@ -32,6 +32,7 @@ eureka:
     #除非客户端知道该元数据的含义。
     metadata-map:
       #定义turbine监控中所属的集群名称
+      #需要和hystrix监控服务中的turbine.aggregator.cluster-config配置使用相同的值
       cluster: owp-demo
   client:
     #指定服务注册中心地址，这里使用3个注册中心相互注册实现集群

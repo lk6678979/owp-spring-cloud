@@ -1,4 +1,5 @@
-# 1 Pom依赖：
+# Eureka客户端（不使用配置中心）
+## 1 Pom依赖：
 ```xml
    <!-- 继承springboot项目-->
     <parent>
@@ -64,7 +65,7 @@
         </plugins>
     </build>
 ``` 
-# 2 代码，只需要在Application类上添加`@EnableEurekaClient`或者`@EnableDiscoveryClient`注解
+## 2 代码，只需要在Application类上添加`@EnableEurekaClient`或者`@EnableDiscoveryClient`注解
 ```java
 package com.owp.client;
 
@@ -103,7 +104,7 @@ public class DemoController {
 }
 
 ```
-# 3 配置文件
+## 3 配置文件
 ```yml
 logging:
   #日志配置路径
@@ -129,14 +130,14 @@ eureka:
       defaultZone: http://127.0.0.1:8806/eureka/,http://127.0.0.1:8807/eureka/
 
 ```
-# 5 启动
-## 5.1 使用maven打包项目
-## 5.2 启动jar
+## 4 启动
+###### 5.1 使用maven打包项目
+##### 5.2 启动jar
 依次执行下面指令启动3个集群的服务：  
 java -jar eureka-client-1.0.0.jar --server.port=9999  
 java -jar eureka-client-1.0.0.jar --server.port=9998  
 java -jar eureka-client-1.0.0.jar --server.port=9997  
-## 5.3 在服务注册中的前端页面可以看到注册的服务
+###### 5.3 在服务注册中的前端页面可以看到注册的服务
 ![](https://github.com/lk6678979/image/blob/master/spring-cloud/eureka-client-center-2.jpg) 
-## 5.4 浏览器输入127.0.0.1:9999/demo/hello?name=ezreal返回数据
+### 5.4 浏览器输入127.0.0.1:9999/demo/hello?name=ezreal返回数据
 ![](https://github.com/lk6678979/image/blob/master/spring-cloud/eureka-client-2.jpg) 

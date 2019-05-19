@@ -1,4 +1,4 @@
-# spingcloud客户端（使用配置中心）
+# Zuul路由网关（使用配置中心）
 ## 1. 项目创建、工程pom.xml文件中的依赖如下：
 ```yml
  <!-- 继承springboot项目-->

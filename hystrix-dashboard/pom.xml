@@ -5,10 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.owp</groupId>
-    <artifactId>config-client</artifactId>
+    <artifactId>hystrix-dashboard</artifactId>
     <version>1.0.0</version>
-    <packaging>jar</packaging>
-    <name>config-client</name>
 
     <!-- 继承springboot项目-->
     <parent>
@@ -43,33 +41,21 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
-        </dependency>
         <!-- eureka 客户端依赖 结束-->
-        <!-- 配置中心模式，客户端依赖 开始-->
-        <!-- 使用BUS总线，如果不使用消息总线，可以不配置-->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-bus</artifactId>
-        </dependency>
-        <!-- 使用RabbitMq作为BUS总线的MQ，如果不使用消息总线，可以不配置-->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
-        </dependency>
-        <!-- 配置中心核心类 -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-config</artifactId>
-        </dependency>
-        <!-- 配置中心模式，客户端依赖 结束-->
-        <!-- Hystrix监控依赖-->
+        <!-- hystrix仪表盘依赖,基于turbine实现集群模式 开始 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-turbine</artifactId>
+        </dependency>
+        <!-- hystrix仪表盘依赖,基于turbine实现集群模式 结束 -->
     </dependencies>
 
     <dependencyManagement>

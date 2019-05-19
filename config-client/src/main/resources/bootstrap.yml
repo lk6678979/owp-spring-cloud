@@ -27,6 +27,12 @@ eureka:
     health-check-url-path: /actuator/health
     perferIpAddress: true
     #ipAddress: 192.168.0.40
+    #自定义元数据：可以使用eureka.instance.metadata-map配置，
+    #这些元数据可以在远程客户端中访问，但是一般不改变客户端行为，
+    #除非客户端知道该元数据的含义。
+    metadata-map:
+      #定义turbine监控中所属的集群名称
+      cluster: owp-demo
   client:
     #指定服务注册中心地址，这里使用3个注册中心相互注册实现集群
     #配置中心，客户端访问，eureka.client.serviceUrl.defaultZone必须在bootstrap下面,

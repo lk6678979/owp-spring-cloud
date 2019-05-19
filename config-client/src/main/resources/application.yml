@@ -1,2 +1,5 @@
 server:
   port: 8301
+feign:
+  hystrix:
+    enabled: true

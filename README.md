@@ -4,5 +4,5 @@
 [3. 配置中心](https://github.com/lk6678979/owp-spring-cloud/tree/master/config-server)  
 [4. Eureka客户端（使用配置中心）](https://github.com/lk6678979/owp-spring-cloud/tree/master/config-client)  
 [5. spring-admin监控中心](https://github.com/lk6678979/owp-spring-cloud/tree/master/monitor-center)  
-
+[6. zuul-server路由网关](https://github.com/lk6678979/owp-spring-cloud/tree/master/zuul-server)  
 

@@ -1,7 +1,7 @@
 # spingcloud客户端（使用配置中心）
 ## 1. 项目创建、工程pom.xml文件中的依赖如下：
 ```yml
-<!-- 继承springboot项目-->
+ <!-- 继承springboot项目-->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -56,6 +56,11 @@
             <artifactId>spring-cloud-starter-config</artifactId>
         </dependency>
         <!-- 配置中心模式，客户端依赖 结束-->
+        <!-- zull网关依赖-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -85,13 +90,15 @@
 ```
 
 ## 2.代码编写
-### 2.1 JAVA代码，只需要在Application类上添加`@EnableEurekaClient`或者`@EnableDiscoveryClient`注解
+#### JAVA代码，在Application类上添加`@EnableEurekaClient`或者`@EnableDiscoveryClient`注解
+#### 再添加`@EnableZuulProxy`注解开启zuul网关
 ```java
-package com.owp.configclient;
+package com.owp.zuul;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 //import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
@@ -104,12 +111,14 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableDiscoveryClient
 //@EnableFeignClients是Feign远程调用所需配置，一般都会使用，后面再介绍
 @EnableFeignClients
+@EnableZuulProxy
 public class Application {
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
 }
+
 ```
 ### 2.2 创建2个配置文件，applycation.yml,bootstrap.yml
 * <h4>`applycation.yml`(仅配置端口号，实际部署的时候一般会再次设置端口号，这里测试用)</h4> 
@@ -117,7 +126,7 @@ public class Application {
 ```
 #服务启动端口号
 server:
-  port: 8301
+  port: 8501
 ```
 * <h4>`bootstrap.yml`(优先于applycation.yml加载)</h4>
 
@@ -127,22 +136,12 @@ server:
 #文件路径规则：name-profile
 spring:
   application:
-    name: demo
+    name: zuul-server
   cloud:
     config:
       #配置名称，在spring本地其实默认对应的是项目名字，如果不设置会去取spring.application.name
       #对应config-server端的{application}
-#bootstrap.yml中的配置会先于application.yml加载,
-#config部分的配置必须先于application.yml被加载
-#文件路径规则：name-profile
-spring:
-  application:
-    name: config-client
-  cloud:
-    config:
-      #配置名称，在spring本地其实默认对应的是项目名字，如果不设置会去取spring.application.name
-      #对应config-server端的{application}
-      name: config-client
+      name: zuul-server
       #通过URL获取配置中心服务器
       #uri: http://localhost:8409
       label: master
@@ -158,59 +157,107 @@ eureka:
     #设置当前实例的主机名称(说明：该host将会在服务调用时使用，调用方需要配置该host对应的ip)
     #如果不想使用host使用ip在注册使用，则配置eureka.instance.perferIpAddress=true
     #preferIpAddress: true
+    preferIpAddress: true
     health-check-url-path: /actuator/health
-    perferIpAddress: true
-    #ipAddress: 192.168.0.40
   client:
     #指定服务注册中心地址，这里使用3个注册中心相互注册实现集群
     #配置中心，客户端访问，eureka.client.serviceUrl.defaultZone必须在bootstrap下面,
     #必须和spring.cloud.config.discovery.enabled、spring.cloud.config.discovery.serviceId写在一个文件里
    serviceUrl:
-      defaultZone: http://127.0.0.1:8806/eureka/,http://127.0.0.1:8807/eureka/
+    defaultZone: http://127.0.0.1:8806/eureka/,http://127.0.0.1:8807/eureka/
 ```
 说明：  
     1.如果不需要使用mq做消息总线，可以去掉rabbitmq和management配置，pom中也去掉对应部分，但是在更新配置文件时，就需要每个使用配置中心的客户端都去做刷新操作/bus/refresh  
 2.`GIT上的配置文件名称的格式都是application-profile,配置中心也是根据uri/search-paths/name-profire的格式寻找配置文件，如果name如果不设置就是该服务的spring.application.name`
-### 2.3 测试属性读取的代码
+### 2.3 创建拦截器
 ```java
-package com.owp.configclient;
+package com.owp.zuul;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.netflix.zuul.ZuulFilter;
+import com.netflix.zuul.context.RequestContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@RestController
-@RequestMapping("/demo")
-public class DemoController {
-    @Value("${business.name}")
-    String name;
+import javax.servlet.http.HttpServletRequest;
 
-    @Value("${business.sex}")
-    String sex;
+public class LoginFilter extends ZuulFilter {
+    private static Logger log = LoggerFactory.getLogger(LoginFilter.class);
 
-    @GetMapping("/hello")
-    public String demoHello() {
-        return "姓名：" + name + ",性别:" + sex;
+    /**
+     * filterType：返回一个字符串代表过滤器的类型，在zuul中定义了四种不同生命周期的过滤器类型，具体如下：
+     * pre：路由之前
+     * routing：路由之时
+     * post： 路由之后
+     * error：发送错误调用
+     * filterOrder：过滤的顺序
+     * shouldFilter：这里可以写逻辑判断，是否要过滤，本文true,永远过滤。
+     * run：过滤器的具体逻辑。可用很复杂，包括查sql，nosql去判断该请求到底有没有权限访问。
+     */
+    @Override
+    public String filterType() {
+        return "pre";
+    }
+
+    @Override
+    public int filterOrder() {
+        return 0;
+    }
+
+    @Override
+    public boolean shouldFilter() {
+        return true;
+    }
+
+    @Override
+    public Object run() {
+        RequestContext ctx = RequestContext.getCurrentContext();
+        HttpServletRequest request = ctx.getRequest();
+        log.info(String.format("%s >>> %s", request.getMethod(), request.getRequestURL().toString()));
+        Object accessToken = request.getParameter("token");
+        if (accessToken == null) {
+            ctx.setSendZuulResponse(false);
+            ctx.setResponseStatusCode(401);
+            try {
+                ctx.getResponse().getWriter().write("NO TOKEN");
+            } catch (Exception e) {
+            }
+
+            return null;
+        }
+        log.info("ok");
+        return null;
     }
 }
+```
+### 2.4 注入拦截器
+```java
+package com.owp.zuul;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class FilterConfig {
+
+    @Bean
+    public LoginFilter getLoginFilter(){
+        return new LoginFilter();
+    }
+}
 ```
 ## 3 启动
 ### 3.1 使用maven打包项目
 ### 3.2 启动jar
 依次执行下面指令启动3个集群的注册中心：  
-java -jar config-client-1.0.0.jar --server.port=8301  
-java -jar config-client-1.0.0.jar --server.port=8302  
-java -jar config-client-1.0.0.jar --server.port=8303  
-### 3.3 前端测试获取配置文件
-#### 在浏览器依次打开:
-http://127.0.0.1:8301/demo  
-http://127.0.0.1:8302/demo  
-http://127.0.0.1:8303/demo  
+java -jar zuul-server-1.0.0.jar --server.port=8501  
+java -jar zuul-server-1.0.0.jar --server.port=8502  
+java -jar zuul-server-1.0.0.jar --server.port=8503  
+### 3.3 启动用来测试的服务config-client
+java -jar config-client-1.0.0.jar --server.port=8401  
 #### git上的配置文件如下：
 ```yml
+server:
+  port: 8501
 logging:
   config: classpath:logback-spring-local.xml
 spring:
@@ -230,10 +277,36 @@ management:
     health:
       #显示健康具体信息  默认不会显示详细信息
       show-details: ALWAYS
-#自定义配置
-business: 
-  name: 张三
-  sex: 男
+##timeout config
+hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
+zuul:
+ #配置被忽略的路径，配置后从网关无法再访问这些路径
+ ignored-patterns: /*/*/inside/**
+ #设置超时时间
+ host:
+  connect-timeout-millis: 10000
+  socket-timeout-millis: 10000
+#设置ribbon超时时间和重试机制
+ribbon:
+  ReadTimeout: 10000
+  ConnectTimeout: 10000
+  MaxAutoRetries: 2
+  MaxAutoRetriesNextServer: 1
 ```
+### 3.3 前端测试获取配置文件
+#### 在浏览器打开(无TOKEN会被拦截）:
+http://127.0.0.1:8501/config-client/demo/hello  
 #### 浏览器访问结果如下：
-![](https://github.com/lk6678979/image/blob/master/spring-cloud/config-client.jpg)  
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/zuul-no-token.png)  
+#### 在浏览器打开(有TOKEN正常输出结果）:
+http://127.0.0.1:8501/config-client/demo/hello?token=1  
+#### 浏览器访问结果如下：
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/zuul-token.png)  

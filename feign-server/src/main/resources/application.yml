@@ -4,12 +4,18 @@ logging:
   config: classpath:logback-spring-local.xml
 spring:
   rabbitmq:
-      host: 192.168.0.90
-      port: 5672
-      username: sziov
-      password: sziov
+    host: 192.168.0.90
+    port: 5672
+    username: sziov
+    password: sziov
   application:
     name: feign-server
+  sleuth:
+    sampler:
+      probability: 1.0 # 将采样比例设置为 1.0，也就是全部都需要。默认是 0.1
+  zipkin:
+    base-url: http://127.0.0.1:9411 # 指定了 Zipkin 服务器的地址
+    enabled: true
 #开启feign的熔断器（使用hystrix实现）
 feign:
   hystrix:

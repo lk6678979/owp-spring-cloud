@@ -8,3 +8,4 @@
 [7. Feign远程调用](https://github.com/lk6678979/owp-spring-cloud/tree/master/feign-server)  
 [8. Hystrix仪表盘监控-Turbine实现](https://github.com/lk6678979/owp-spring-cloud/tree/master/hystrix-dashboard)  
 [9. Hystrix仪表盘监控-基于Turbine和RabbitMQ实现](https://github.com/lk6678979/owp-spring-cloud/tree/master/hystrix-dashboard-mq)  
+[10. Zipkin链路跟踪（普通Http版和RabiitMQ版）](https://github.com/lk6678979/owp-spring-cloud/tree/master/zipkin)  

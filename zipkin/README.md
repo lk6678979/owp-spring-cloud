@@ -7,9 +7,17 @@ https://github.com/apache/incubator-zipkin/tree/master/zipkin-server
 ![](https://github.com/lk6678979/image/blob/master/spring-cloud/zipkin-git.jpg)  
 ### 1.2 启动Zipkin服务端
 #### 1.2.1 jar直接启动方式
+```shell
 java -jar zipkin-server-2.12.9-exec.jar --server.port=9144
-
-
+```
+#### 1.2.2 使用service启动
+```shell
+ln -s zipkin-server-2.12.9-exec.jar /etc/init.d/zipkin-server
+chown U+X zipkin-server
+service zipkin-server start --server.port=9144
+```
+#### 1.2.2 启动后访问ip:port/zipkin/,例如默认的http://127.0.0.1:9411/zipkin/,可以看到如下界面
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/zipkin-home-1.jpg)  
 ### 1.2 创建完的工程pom.xml文件中的依赖如下：
 
 ```xml

@@ -7,4 +7,4 @@
 [6. Zuul-server路由网关](https://github.com/lk6678979/owp-spring-cloud/tree/master/zuul-server)  
 [7. Feign远程调用](https://github.com/lk6678979/owp-spring-cloud/tree/master/feign-server)  
 [8. Hystrix仪表盘监控-Turbine实现](https://github.com/lk6678979/owp-spring-cloud/tree/master/hystrix-dashboard)  
-[8. Hystrix仪表盘监控-基于Turbine和RabbitMQ实现](https://github.com/lk6678979/owp-spring-cloud/tree/master/hystrix-dashboard-mq)  
+[9. Hystrix仪表盘监控-基于Turbine和RabbitMQ实现](https://github.com/lk6678979/owp-spring-cloud/tree/master/hystrix-dashboard-mq)  

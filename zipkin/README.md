@@ -4,7 +4,7 @@
 ### 1.1 去zipkin的git中拉取源码自己免疫jar包，或者在git上直接下载jar（git有使用说明，建议都了解一下），地址：  
 #### git有使用说明，建议都了解一下
 https://github.com/apache/incubator-zipkin/tree/master/zipkin-server  
-![](https://github.com/lk6678979/image/blob/master/spring-cloud/zipkin-git.png)  
+![](https://github.com/lk6678979/image/blob/master/spring-cloud/zipkin-git.jpg)  
 ### 1.2 启动Zipkin服务端
 #### 1.2.1 jar直接启动方式
 java -jar zipkin-server-2.12.9-exec.jar --server.port=9144

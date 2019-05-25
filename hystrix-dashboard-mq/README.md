@@ -1,4 +1,5 @@
 # Hystrix仪表盘监控-基于Turbine和RabbitMQ实现
+# ⭐注意：springboot2.X使用spring5，spring-cloud-starter-netflix-turbine-stream中的拦截器会导致前端无法获取到ui界面的静态文件，建议等官方解决兼容性后再使用
 ## 1. 监控服务项目创建、工程pom.xml文件中的依赖如下：
 ```xml
  <!-- 继承springboot项目-->
@@ -190,6 +191,10 @@ turbine:
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-netflix-hystrix-stream</artifactId>
         </dependency>
+        <dependency>
+			        <groupId>org.springframework.cloud</groupId>
+			        <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+		      </dependency>
 ```
 ### 3.2 application.yml添加配置
 ```yml

@@ -1,6 +1,6 @@
 # spingcloud客户端（使用配置中心）
 ## 1. 项目创建、工程pom.xml文件中的依赖如下：
-```yml
+```xml
 <!-- 继承springboot项目-->
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -114,14 +114,14 @@ public class Application {
 ### 2.2 创建2个配置文件，applycation.yml,bootstrap.yml
 * <h4>`applycation.yml`(仅配置端口号，实际部署的时候一般会再次设置端口号，这里测试用)</h4> 
 
-```
+```yml
 #服务启动端口号
 server:
   port: 8301
 ```
 * <h4>`bootstrap.yml`(优先于applycation.yml加载)</h4>
 
-```
+```yml
 #bootstrap.yml中的配置会先于application.yml加载,
 #config部分的配置必须先于application.yml被加载
 #文件路径规则：name-profile

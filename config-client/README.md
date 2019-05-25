@@ -127,16 +127,6 @@ server:
 #文件路径规则：name-profile
 spring:
   application:
-    name: demo
-  cloud:
-    config:
-      #配置名称，在spring本地其实默认对应的是项目名字，如果不设置会去取spring.application.name
-      #对应config-server端的{application}
-#bootstrap.yml中的配置会先于application.yml加载,
-#config部分的配置必须先于application.yml被加载
-#文件路径规则：name-profile
-spring:
-  application:
     name: config-client
   cloud:
     config:

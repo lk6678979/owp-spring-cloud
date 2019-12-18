@@ -273,3 +273,94 @@ http://127.0.0.1:7000
 ![](https://github.com/lk6678979/image/blob/master/spring-cloud/admin-wall.jpg)  
 #### 服务详情：
 ![](https://github.com/lk6678979/image/blob/master/spring-cloud/admin-app-info.jpg)  
+
+### 4 邮件功能
+#### 4.1 pom添加依赖
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-mail</artifactId>
+</dependency>
+```
+#### 4.2 添加配置
+```yml
+spring:
+  mail:
+    host: smtp.163.com
+    username: xxxx@163.com
+    #这里是授权码，不是登录密码
+    password: xxxx
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  boot:
+    admin:
+      notify:
+        mail:
+          from: xxxx@163.com
+          to: xxxx@qq.com
+```
+*注意 : 配置了邮件通知后，会出现 反复通知 service offline / up。这个问题的原因在于 查询应用程序的状态和信息超时，下面给出两种解决方案：
+```
+#方法一：增加超时时间（单位:ms）
+spring.boot.admin.monitor.read-timeout=20000
+
+#方法二：关闭闭未使用或不重要的检查点
+management.health.db.enabled=false
+management.health.mail.enabled=false
+management.health.redis.enabled=false
+management.health.mongo.enabled=false
+```
+#### 4.3 添加配置
+可以通过添加实现Notifier接口的Spring Beans来添加您自己的通知程序，最好通过扩展 AbstractEventNotifier或AbstractStatusChangeNotifier。在sc-admin-server工程中编写一个自定义的通知器：
+```java
+@Component
+public class CustomNotifier  extends AbstractStatusChangeNotifier {
+    private static final Logger LOGGER = LoggerFactory.getLogger( LoggingNotifier.class);
+
+    public CustomNotifier(InstanceRepository repository) {
+        super(repository);
+    }
+
+    @Override
+    protected Mono<Void> doNotify(InstanceEvent event, Instance instance) {
+        return Mono.fromRunnable(() -> {
+            if (event instanceof InstanceStatusChangedEvent) {
+                LOGGER.info("Instance {} ({}) is {}", instance.getRegistration().getName(), event.getInstance(),
+                        ((InstanceStatusChangedEvent) event).getStatusInfo().getStatus());
+
+                String status = ((InstanceStatusChangedEvent) event).getStatusInfo().getStatus();
+
+                switch (status) {
+                    // 健康检查没通过
+                    case "DOWN":
+                        System.out.println("发送 健康检查没通过 的通知！");
+                        break;
+                    // 服务离线
+                    case "OFFLINE":
+                        System.out.println("发送 服务离线 的通知！");
+                        break;
+                    //服务上线
+                    case "UP":
+                        System.out.println("发送 服务上线 的通知！");
+                        break;
+                    // 服务未知异常
+                    case "UNKNOWN":
+                        System.out.println("发送 服务未知异常 的通知！");
+                        break;
+                    default:
+                        break;
+                }
+
+            } else {
+                LOGGER.info("Instance {} ({}) {}", instance.getRegistration().getName(), event.getInstance(),
+                        event.getType());
+            }
+        });
+    }
+}
+```

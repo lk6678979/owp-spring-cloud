@@ -304,7 +304,7 @@ spring:
           from: xxxx@163.com
           to: xxxx@qq.com
 ```
-*注意 : 配置了邮件通知后，会出现 反复通知 service offline / up。这个问题的原因在于 查询应用程序的状态和信息超时，下面给出两种解决方案：
+* 注意 : 配置了邮件通知后，会出现 反复通知 service offline / up。这个问题的原因在于 查询应用程序的状态和信息超时，下面给出两种解决方案：
 ```
 #方法一：增加超时时间（单位:ms）
 spring.boot.admin.monitor.read-timeout=20000

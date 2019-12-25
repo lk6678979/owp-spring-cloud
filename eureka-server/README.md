@@ -135,4 +135,6 @@ http://127.0.0.1:8807/
 http://127.0.0.1:8808/  
 界面效果如下：
 ![](https://github.com/lk6678979/image/blob/master/spring-cloud/eureka-ui.png)  
-	
+
+### 2.4 RestFull
+https://github.com/lk6678979/owp-spring-cloud/blob/master/eureka-server/EurekaRest.md

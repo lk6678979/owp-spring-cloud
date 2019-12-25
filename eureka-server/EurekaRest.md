@@ -5,7 +5,7 @@ Eureka Server内部通过JAX-RS(Java API for RESTful Web Services)规范提供�
 Eureka提供的REST请求可以支持XML以及JSON形式通信，默认采用XML方式，REST列表如表所示：
 
 请求名称|请求方式|HTTP地址|请求描述
--|-|-
+-|-|-|-|
 注册新服务|POST|/eureka/apps/{appID}|传递JSON或者XML格式参数内容，HTTP code为204时表示成功
 取消注册服务|DELETE	/eureka/apps/{appID}/{instanceID}|HTTP code为200时表示成功
 发送服务心跳|PUT	/eureka/apps/{appID}/{instanceID}|HTTP code为200时表示成功

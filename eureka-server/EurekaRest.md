@@ -17,3 +17,7 @@ Eureka提供的REST请求可以支持XML以及JSON形式通信，默认采用XML
 变更元数据|	PUT	|/eureka/apps/{appID}/{instanceID}/metadata?key=value|HTTP code为200时表示成功
 查询指定IP下的服务列表|	GET	|/eureka/vips/{vipAddress}|HTTP code为200时表示成功
 查询指定安全IP下的服务列表|	GET	|/eureka/svips/{svipAddress}|HTTP code为200时表示成功
+
+在上面列表中参数解释  
+* {appID}：服务名称，对应spring.application.name参数值
+* {instanceID}：实例名称，如果已经自定义instanceId则对应eureka.instance.instance-id参数值
